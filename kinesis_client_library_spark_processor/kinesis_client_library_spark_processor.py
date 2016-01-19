@@ -24,8 +24,15 @@ kinesis_stream = KinesisUtils.createStream(
     spark_streaming_context, kinesis_app_name, kinesis_stream, kinesis_endpoint,
     aws_region, kinesis_initial_position, kinesis_checkpoint_interval) # previous example had ', StorageLevel.MEMORY_AND_DISK_2' at the end of the call
 
-lines = kinesis_stream.map(lambda x: x[1])
-counts = lines.flatMap(lambda line: line.split(",")) \
+print("debug 1")
+
+counts = kinesis_stream.flatMap(lambda line: line.split(",")) \
         .map(lambda word: (word, 1)) \
         .reduceByKey(lambda a, b: a+b)
+print("debug 2")
 counts.pprint()
+print("debug 3")
+spark_streaming_context.start()
+print("debug 4")
+spark_streaming_context.awaitTermination()
+print("debug 5")
