@@ -13,7 +13,7 @@ import calendar
 
 # script will pull credentials & regions from AWSCLI
 # otherwise define these variables
-kinesis_stream = 'spark_streaming_kinesis_demo' # replace with your kinesis stream name
+kinesis_stream = 'spark_streaming_kinesis_demo' # replace with your kinesis stream name - assumes that kinesis stream is in the same region as defined in CLI config
 kinesis_client = boto3.client('kinesis')
 
 # common username for kinesis records
