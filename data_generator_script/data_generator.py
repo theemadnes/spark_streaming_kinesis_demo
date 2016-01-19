@@ -38,7 +38,7 @@ def start():
         result = kinesis_client.put_record(StreamName=kinesis_stream, Data=payload, PartitionKey=partition_key)
         print(result)
 
-        time.sleep(.5)
+        # time.sleep(.5) # do we need to sleep?
 
 
 if __name__ == "__main__":
