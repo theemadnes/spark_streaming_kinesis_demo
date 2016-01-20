@@ -29,6 +29,9 @@ print("debug 1")
 counts = kinesis_stream.flatMap(lambda line: line.split(",")) \
         .map(lambda word: (word, 1)) \
         .reduceByKey(lambda a, b: a+b)
+
+# this is where to submit results to somewhere 
+
 print("debug 2")
 counts.pprint()
 print("debug 3")
