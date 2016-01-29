@@ -10,6 +10,7 @@ import boto3
 import random
 import string
 import calendar
+import json
 
 # script will pull credentials & regions from AWSCLI
 # otherwise define these variables
@@ -18,6 +19,7 @@ kinesis_client = boto3.client('kinesis')
 
 # common username for kinesis records
 user_name = 'alex'
+payload = {}
 
 def random_string_generator(size=6, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for x in range(size))
@@ -31,11 +33,15 @@ def start():
 
         # put together the payload for kinesis
         partition_key = random.choice('abcdefghij') # more partition keys distribute records across shards
-        payload = user_name + ',' + random_string_generator() + ',' + str(random_int_generator()) + ',' + datetime.datetime.isoformat(datetime.datetime.now()) + ',' + str(int(time.time()))
+        payload['user_name'] = user_name
+        payload['random_int'] = random_int_generator()
+        payload['data_string'] = random_string_generator()
+        payload['time_stamp'] = int(time.time())
+        
         print(payload)
 
         # send this to kinesis
-        result = kinesis_client.put_record(StreamName=kinesis_stream, Data=payload, PartitionKey=partition_key)
+        result = kinesis_client.put_record(StreamName=kinesis_stream, Data=json.dumps(payload), PartitionKey=partition_key)
         print(result)
 
         # time.sleep(.5) # do we need to sleep?
