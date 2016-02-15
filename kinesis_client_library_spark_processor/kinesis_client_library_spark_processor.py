@@ -1,19 +1,23 @@
+### this sample program takes data pulled from a Kinesis stream, in JSON format, and converts to CSV and saves to S3
+
 # import critical modules
 from __future__ import print_function # support python 2.7 & 3
 from pyspark import SparkContext
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kinesis import KinesisUtils, InitialPositionInStream
+import datetime
+import json
 
 # Note: credentials will be pulled from IAM role assigned to EMR nodes. Make sure permissions are set properly for access to your Kinesis stream
 
 # define variables
 aws_region = 'us-west-2' # replace w/ AWS region used for Kinesis stream
 kinesis_stream = 'spark_streaming_kinesis_demo' # replace with your Kinesis stream name
-kinesis_endpoint = 'https://kinesis.' + aws_region + '.amazonaws.com' 
+kinesis_endpoint = 'https://kinesis.' + aws_region + '.amazonaws.com'
 kinesis_app_name = 'alex_test_app'
 kinesis_initial_position = InitialPositionInStream.LATEST # InitialPositionInStream.TRIM_HORIZON | InitialPositionInStream.LATEST
-kinesis_checkpoint_interval = 2 # define how long to checkpoint when processing through the Kinesis stream
-spark_batch_interval = 1 # 
+kinesis_checkpoint_interval = 10 # define how long to checkpoint when processing through the Kinesis stream
+spark_batch_interval = 10 #
 
 # configure spark elements
 spark_context = SparkContext(appName=kinesis_app_name)
@@ -24,18 +28,20 @@ kinesis_stream = KinesisUtils.createStream(
     spark_streaming_context, kinesis_app_name, kinesis_stream, kinesis_endpoint,
     aws_region, kinesis_initial_position, kinesis_checkpoint_interval) # previous example had ', StorageLevel.MEMORY_AND_DISK_2' at the end of the call
 
-print("debug 1")
-
-counts = kinesis_stream.flatMap(lambda line: line.split(",")) \
+# old sample code for dstream transforms / processing
+'''counts = kinesis_stream.flatMap(lambda line: line.split(",")) \
         .map(lambda word: (word, 1)) \
-        .reduceByKey(lambda a, b: a+b)
+        .reduceByKey(lambda a, b: a+b)'''
 
-# this is where to submit results to somewhere 
+# take kinesis stream JSON data and convert to CSV # just realized we're still dealing with dstreams, not RDD, so naming is inaccurate
+py_dict_rdd = kinesis_stream.map(lambda x: json.loads(x))
+# need to convert int (time_stamp & random_int) to string
+csv_rdd = py_dict_rdd.map(lambda x: x['user_name'] + ',' + str(x['time_stamp']) + ',' + x['data_string'] + ',' + str(x['random_int']))
 
-print("debug 2")
-counts.pprint()
-print("debug 3")
+# save that rdd to S3
+commit_to_s3 = csv_rdd.saveAsTextFiles('s3://mattsona-public/' + datetime.datetime.isoformat(datetime.datetime.now()).replace(':','_'))
+# commit_to_s3 = kinesis_stream.saveAsTextFiles('s3://mattsona-public/' + datetime.datetime.isoformat(datetime.datetime.now()).replace(':','_'))
+
 spark_streaming_context.start()
-print("debug 4")
+
 spark_streaming_context.awaitTermination()
-print("debug 5")
