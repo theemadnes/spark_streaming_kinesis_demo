@@ -1,4 +1,5 @@
 ### this sample program takes data pulled from a Kinesis stream, in JSON format, and converts to CSV and saves to S3
+### when executing from the CLI using
 
 # import critical modules
 from __future__ import print_function # support python 2.7 & 3
@@ -11,6 +12,7 @@ import json
 # Note: credentials will be pulled from IAM role assigned to EMR nodes. Make sure permissions are set properly for access to your Kinesis stream
 
 # define variables
+s3_target_bucket_name = 'mattsona-public' # replace with your bucket name for target data
 aws_region = 'us-west-2' # replace w/ AWS region used for Kinesis stream
 kinesis_stream = 'spark_streaming_kinesis_demo' # replace with your Kinesis stream name
 kinesis_endpoint = 'https://kinesis.' + aws_region + '.amazonaws.com'
@@ -39,7 +41,7 @@ py_dict_rdd = kinesis_stream.map(lambda x: json.loads(x))
 csv_rdd = py_dict_rdd.map(lambda x: x['user_name'] + ',' + str(x['time_stamp']) + ',' + x['data_string'] + ',' + str(x['random_int']))
 
 # save that rdd to S3
-commit_to_s3 = csv_rdd.saveAsTextFiles('s3://mattsona-public/' + datetime.datetime.isoformat(datetime.datetime.now()).replace(':','_'))
+commit_to_s3 = csv_rdd.saveAsTextFiles('s3://' + s3_target_bucket_name + '/spark_csv_processing/ '+ datetime.datetime.isoformat(datetime.datetime.now()).replace(':','_'))
 # commit_to_s3 = kinesis_stream.saveAsTextFiles('s3://mattsona-public/' + datetime.datetime.isoformat(datetime.datetime.now()).replace(':','_'))
 
 spark_streaming_context.start()
