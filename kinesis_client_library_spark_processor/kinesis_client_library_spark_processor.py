@@ -15,11 +15,11 @@ import json
 s3_target_bucket_name = 'mattsona-public' # replace with your bucket name for target data
 aws_region = 'us-west-2' # replace w/ AWS region used for Kinesis stream
 kinesis_stream = 'spark_streaming_kinesis_demo' # replace with your Kinesis stream name
-kinesis_endpoint = 'https://kinesis.' + aws_region + '.amazonaws.com'
-kinesis_app_name = 'alex_test_app'
+kinesis_endpoint = 'https://kinesis.' + aws_region + '.amazonaws.com' # the public endpiont of the AWS region this is executed from
+kinesis_app_name = 'alex_test_app' # app name used to track process through the Kinesis stream
 kinesis_initial_position = InitialPositionInStream.LATEST # InitialPositionInStream.TRIM_HORIZON | InitialPositionInStream.LATEST
 kinesis_checkpoint_interval = 10 # define how long to checkpoint when processing through the Kinesis stream
-spark_batch_interval = 10 #
+spark_batch_interval = 10 # how many seconds before pulling the next batch of data from the Kinesis stream
 
 # configure spark elements
 spark_context = SparkContext(appName=kinesis_app_name)
