@@ -41,7 +41,7 @@ py_dict_rdd = kinesis_stream.map(lambda x: json.loads(x))
 csv_rdd = py_dict_rdd.map(lambda x: x['user_name'] + ',' + str(x['time_stamp']) + ',' + x['data_string'] + ',' + str(x['random_int']))
 
 # save that rdd to S3
-commit_to_s3 = csv_rdd.saveAsTextFiles('s3://' + s3_target_bucket_name + '/spark_csv_processing/ '+ datetime.datetime.isoformat(datetime.datetime.now()).replace(':','_'))
+commit_to_s3 = csv_rdd.saveAsTextFiles('s3://' + s3_target_bucket_name + '/spark_streaming_processing/ '+ datetime.datetime.isoformat(datetime.datetime.now()).replace(':','_'))
 # commit_to_s3 = kinesis_stream.saveAsTextFiles('s3://mattsona-public/' + datetime.datetime.isoformat(datetime.datetime.now()).replace(':','_'))
 
 spark_streaming_context.start()
