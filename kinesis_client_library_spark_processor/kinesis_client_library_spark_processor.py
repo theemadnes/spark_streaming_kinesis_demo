@@ -12,7 +12,7 @@ import json
 # Note: credentials will be pulled from IAM role assigned to EMR nodes. Make sure permissions are set properly for access to your Kinesis stream
 
 # define variables
-s3_target_bucket_name = 'mattsona-public' # replace with your bucket name for target data
+s3_target_bucket_name = 'mattsona-spark-demo' # replace with your bucket name for target data
 aws_region = 'us-west-2' # replace w/ AWS region used for Kinesis stream
 kinesis_stream = 'spark_streaming_kinesis_demo' # replace with your Kinesis stream name
 kinesis_endpoint = 'https://kinesis.' + aws_region + '.amazonaws.com' # the public endpiont of the AWS region this is executed from
