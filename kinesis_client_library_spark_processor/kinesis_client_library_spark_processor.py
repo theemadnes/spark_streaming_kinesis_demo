@@ -30,15 +30,10 @@ kinesis_stream = KinesisUtils.createStream(
     spark_streaming_context, kinesis_app_name, kinesis_stream, kinesis_endpoint,
     aws_region, kinesis_initial_position, kinesis_checkpoint_interval) # previous example had ', StorageLevel.MEMORY_AND_DISK_2' at the end of the call
 
-# old sample code for dstream transforms / processing
-'''counts = kinesis_stream.flatMap(lambda line: line.split(",")) \
-        .map(lambda word: (word, 1)) \
-        .reduceByKey(lambda a, b: a+b)'''
-
 # take kinesis stream JSON data and convert to CSV # just realized we're still dealing with dstreams, not RDD, so naming is inaccurate
 py_dict_rdd = kinesis_stream.map(lambda x: json.loads(x))
 # need to convert int (time_stamp & random_int) to string
-csv_rdd = py_dict_rdd.map(lambda x: x['user_name'] + ',' + str(x['time_stamp']) + ',' + x['data_string'] + ',' + str(x['random_int']))
+csv_rdd = py_dict_rdd.map(lambda x: x['user_name'] + ',' + str(datetime.datetime.utcfromtimestamp(x['time_stamp'])) + ',' + x['data_string'] + ',' + str(x['random_int']))
 
 # save that rdd to S3
 commit_to_s3 = csv_rdd.saveAsTextFiles('s3://' + s3_target_bucket_name + '/spark_streaming_processing/ '+ datetime.datetime.isoformat(datetime.datetime.now()).replace(':','_'))
