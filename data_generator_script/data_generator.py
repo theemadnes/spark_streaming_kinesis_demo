@@ -47,7 +47,7 @@ def start(argv):
         payload['user_name'] = device_name
         payload['random_int'] = random_int_generator()
         payload['data_string'] = random_string_generator()
-        payload['time_stamp'] = int(time.time())
+        payload['time_stamp'] = time.time() # will use this instead of Kinesis server-side timestamp
 
         print(payload)
 
