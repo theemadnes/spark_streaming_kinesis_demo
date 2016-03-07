@@ -16,7 +16,7 @@ import sys
 
 # script will pull credentials & regions from AWSCLI
 # otherwise define these variables
-kinesis_stream = 'spark_streaming_kinesis_demo' # replace with your kinesis stream name - assumes that kinesis stream is in the same region as defined in CLI config
+kinesis_stream = 'blah12345-kinesisStream-MLIAMV07LW4Z' # replace with your kinesis stream name - assumes that kinesis stream is in the same region as defined in CLI config
 kinesis_client = boto3.client('kinesis')
 
 # set up the variables
